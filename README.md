@@ -190,6 +190,29 @@ See the [Claude Code MCP documentation](https://docs.anthropic.com/en/docs/claud
 ### Other MCP Client Configurations
 
 <details>
+<summary><strong>OpenAI Codex CLI</strong></summary>
+
+Codex CLI uses TOML configuration files:
+
+1. Create or edit the `~/.codex/config.toml` file.
+
+2. Add the following configuration:
+
+```toml
+# IMPORTANT: the top-level key is `mcp_servers` rather than `mcpServers`.
+[mcp_servers.claude-context]
+command = "npx"
+args = ["@zilliz/claude-context-mcp@latest"]
+env = { "OPENAI_API_KEY" = "your-openai-api-key", "MILVUS_TOKEN" = "your-zilliz-cloud-api-key" }
+# Optional: override the default 10s startup timeout
+startup_timeout_ms = 20000
+```
+
+3. Save the file and restart Codex CLI to apply the changes.
+
+</details>
+
+<details>
 <summary><strong>Gemini CLI</strong></summary>
 
 Gemini CLI requires manual configuration through a JSON file:
@@ -601,6 +624,16 @@ Get the current indexing status of a codebase. Shows progress percentage for act
 
 ---
 
+## 📊 Evaluation
+
+Our controlled evaluation demonstrates that Claude Context MCP achieves ~40% token reduction under the condition of equivalent retrieval quality. This translates to significant cost and time savings in production environments. This also means that, under the constraint of limited token context length, using Claude Context yields better retrieval and answer results.
+
+![MCP Efficiency Analysis](assets/mcp_efficiency_analysis_chart.png)
+
+For detailed evaluation methodology and results, see the [evaluation directory](evaluation/).
+
+---
+
 ## 🏗️ Architecture
 
 ![](assets/Architecture.png)
@@ -786,16 +819,6 @@ pnpm dev
 Check the `/examples` directory for complete usage examples:
 
 - **Basic Usage**: Simple indexing and search example
-
----
-
-## 📊 Evaluation
-
-Our controlled evaluation demonstrates that Claude Context MCP achieves ~40% token reduction under the condition of equivalent retrieval quality. This translates to significant cost and time savings in production environments. This also means that, under the constraint of limited token context length, using Claude Context yields better retrieval and answer results.
-
-![MCP Efficiency Analysis](assets/mcp_efficiency_analysis_chart.png)
-
-For detailed evaluation methodology and results, see the [evaluation directory](evaluation/).
 
 ---
 

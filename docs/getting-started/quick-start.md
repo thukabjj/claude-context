@@ -390,14 +390,14 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
 4. Add the server configuration to the `mcpServers` array in the `augment.advanced` object
 
 ```json
-"augment.advanced": { 
-  "mcpServers": [ 
-    { 
-      "name": "claude-context", 
-      "command": "npx", 
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"] 
-    } 
-  ] 
+"augment.advanced": {
+  "mcpServers": [
+    {
+      "name": "claude-context",
+      "command": "npx",
+      "args": ["-y", "@zilliz/claude-context-mcp@latest"]
+    }
+  ]
 }
 ```
 

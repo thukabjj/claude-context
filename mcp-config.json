@@ -1,0 +1,22 @@
+{
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@zilliz/claude-context-mcp@latest"
+            ],
+            "env": {
+                "EMBEDDING_PROVIDER": "OpenRouter",
+                "OPENROUTER_API_KEY": "sk-or-your-openrouter-api-key",
+                "EMBEDDING_MODEL": "nomic-ai/nomic-embed-text-v1.5",
+                "VECTOR_DATABASE_PROVIDER": "ChromaDB",
+                "CHROMA_HOST": "localhost",
+                "CHROMA_PORT": "8002",
+                "HYBRID_MODE": "true",
+                "EMBEDDING_BATCH_SIZE": "100",
+                "SPLITTER_TYPE": "ast"
+            }
+        }
+    }
+}

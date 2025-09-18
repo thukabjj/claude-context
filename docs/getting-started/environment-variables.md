@@ -33,15 +33,15 @@ Claude Context supports a global configuration file at `~/.context/.env` to simp
 > **💡 Note:** `EMBEDDING_MODEL` is a universal environment variable that works with all embedding providers. Simply set it to the model name you want to use (e.g., `text-embedding-3-large` for OpenAI, `voyage-code-3` for VoyageAI, etc.).
 
 > **Supported Model Names:**
-> 
+>
 > - OpenAI Models: See `getSupportedModels` in [`openai-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/openai-embedding.ts) for the full list of supported models.
-> 
+>
 > - VoyageAI Models: See `getSupportedModels` in [`voyageai-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/voyageai-embedding.ts) for the full list of supported models.
-> 
+>
 > - Gemini Models: See `getSupportedModels` in [`gemini-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/gemini-embedding.ts) for the full list of supported models.
-> 
+>
 > - Ollama Models: Depends on the model you install locally.
-> 
+>
 > - OpenRouter Models: See `getSupportedModels` in [`openrouter-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/openrouter-embedding.ts) for the full list of supported models.
 
 > **📖 For detailed provider-specific configuration examples and setup instructions, see the [MCP Configuration Guide](../../packages/mcp/README.md#embedding-provider-configuration).**
@@ -140,4 +140,3 @@ claude mcp add claude-context -- npx @zilliz/claude-context-mcp@latest
 
 For detailed information about file processing rules and how custom patterns work, see:
 - [What files does Claude Context decide to embed?](../troubleshooting/faq.md#q-what-files-does-claude-context-decide-to-embed)
- 

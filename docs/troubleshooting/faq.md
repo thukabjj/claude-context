@@ -16,20 +16,50 @@ Final Files = (All Supported Extensions) - (All Ignore Patterns)
 
 ## Q: Can I use a fully local deployment setup?
 
-**A:** Yes, you can deploy Claude Context entirely on your local infrastructure. While we recommend using the fully managed [Zilliz Cloud](https://cloud.zilliz.com/signup?utm_source=github&utm_medium=referral&utm_campaign=2507-codecontext-readme) service for ease of use, you can also set up your own private local deployment.
+**A:** Yes, you can deploy Claude Context entirely on your local infrastructure with multiple options for both embedding providers and vector databases.
 
-**For local deployment:**
+### Option 1: Fully Local (Ollama + ChromaDB)
+This is the most private setup with everything running locally:
 
-1. **Vector Database (Milvus)**: Deploy Milvus locally using Docker Compose by following the [official Milvus installation guide](https://milvus.io/docs/install_standalone-docker-compose.md). Configure the following environment variables:
-   - `MILVUS_ADDRESS=127.0.0.1:19530` (or your Milvus server address)
+1. **Vector Database (ChromaDB)**: Use ChromaDB as a lightweight, local vector database:
+   - `VECTOR_DATABASE_PROVIDER=ChromaDB`
+   - `CHROMA_HOST=localhost`
+   - `CHROMA_PORT=8000`
+
+2. **Embedding Service (Ollama)**: Run [Ollama](https://ollama.com/) locally for embedding generation:
+   - `EMBEDDING_PROVIDER=Ollama`
+   - `OLLAMA_HOST=http://127.0.0.1:11434`
+   - `EMBEDDING_MODEL=nomic-embed-text`
+
+### Option 2: Open Source Models via OpenRouter + ChromaDB
+Use open source models through OpenRouter API with local ChromaDB:
+
+1. **Vector Database (ChromaDB)**: Same as above
+2. **Embedding Service (OpenRouter)**: Access open source models via OpenRouter API:
+   - `EMBEDDING_PROVIDER=OpenRouter`
+   - `OPENROUTER_API_KEY=your-openrouter-api-key`
+   - `EMBEDDING_MODEL=nomic-ai/nomic-embed-text-v1.5` (or other open source models)
+
+### Option 3: Traditional Local (Ollama + Milvus)
+Use Ollama with local Milvus deployment:
+
+1. **Vector Database (Milvus)**: Deploy Milvus locally using Docker Compose by following the [official Milvus installation guide](https://milvus.io/docs/install_standalone-docker-compose.md):
+   - `VECTOR_DATABASE_PROVIDER=Milvus`
+   - `MILVUS_ADDRESS=127.0.0.1:19530`
    - `MILVUS_TOKEN=your-optional-token` (if authentication is enabled)
 
-2. **Embedding Service (Ollama)**: Install and run [Ollama](https://ollama.com/) locally for embedding generation. Configure:
-   - `EMBEDDING_PROVIDER=Ollama`
-   - `OLLAMA_HOST=http://127.0.0.1:11434` (or your Ollama server URL)
-   - `OLLAMA_MODEL=nomic-embed-text` (or your preferred embedding model)
+2. **Embedding Service (Ollama)**: Same as Option 1
 
-This setup gives you complete control over your data while maintaining full functionality. See our [environment variables guide](../getting-started/environment-variables.md) for detailed configuration options.
+### Quick Setup
+We provide a setup script for the easiest local deployment (Option 1):
+```bash
+# Run the local setup script
+./scripts/setup-local.sh
+```
+
+This will automatically start ChromaDB and Ollama containers and provide you with the exact configuration needed.
+
+See our [environment variables guide](../getting-started/environment-variables.md) for detailed configuration options for all deployment scenarios.
 
 ## Q: Does it support multiple projects / codebases?
 

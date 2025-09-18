@@ -11,6 +11,7 @@
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/zilliz_universe.svg?style=social&label=Follow%20%40Zilliz)](https://twitter.com/zilliz_universe)
 [![DeepWiki](https://img.shields.io/badge/DeepWiki-AI%20Docs-purple.svg?logo=gitbook&logoColor=white)](https://deepwiki.com/zilliztech/claude-context)
 <a href="https://discord.gg/mKc3R95yE5"><img height="20" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white" alt="discord" /></a>
+
 </div>
 
 **Claude Context** is an MCP plugin that adds semantic code search to Claude Code and other AI coding agents, giving them deep context from your entire codebase.
@@ -27,7 +28,120 @@
 
 Model Context Protocol (MCP) allows you to integrate Claude Context with your favorite AI coding assistants, e.g. Claude Code.
 
+## 🏠 Local Deployment Options
+
+Claude Context now supports multiple deployment options for different privacy and cost requirements:
+
+### Option 1: Fully Local (Ollama + ChromaDB) 🔒
+
+**Most Private - Everything runs locally**
+
+```bash
+# Quick setup with our automated script
+./scripts/setup-local.sh
+
+# Manual setup
+docker-compose -f docker-compose.local.yml up -d
+```
+
+**Configuration (output by setup script):**
+
+```json
+{
+  "mcpServers": {
+    "claude-context": {
+      "command": "node",
+      "args": ["/path/to/claude-context/packages/mcp/dist/index.js"],
+      "env": {
+        "EMBEDDING_PROVIDER": "Ollama",
+        "OLLAMA_HOST": "http://localhost:11434",
+        "EMBEDDING_MODEL": "nomic-embed-text",
+        "VECTOR_DATABASE_PROVIDER": "ChromaDB",
+        "CHROMA_HOST": "localhost",
+        "CHROMA_PORT": "8002"
+      }
+    }
+  }
+}
+```
+
+### Option 2: Open Source Models via OpenRouter 🌐
+
+**Best of both worlds - Open source models with API access**
+
+```json
+{
+  "mcpServers": {
+    "claude-context": {
+      "command": "npx",
+      "args": ["@zilliz/claude-context-mcp@latest"],
+      "env": {
+        "EMBEDDING_PROVIDER": "OpenRouter",
+        "OPENROUTER_API_KEY": "sk-or-your-openrouter-api-key",
+        "EMBEDDING_MODEL": "nomic-ai/nomic-embed-text-v1.5",
+        "VECTOR_DATABASE_PROVIDER": "ChromaDB",
+        "CHROMA_HOST": "localhost",
+        "CHROMA_PORT": "8000"
+      }
+    }
+  }
+}
+```
+
+### Option 3: Cloud Deployment (OpenAI + Zilliz Cloud) ☁️
+
+**Easiest setup - Fully managed services**
+
+```json
+{
+  "mcpServers": {
+    "claude-context": {
+      "command": "npx",
+      "args": ["@zilliz/claude-context-mcp@latest"],
+      "env": {
+        "EMBEDDING_PROVIDER": "OpenAI",
+        "OPENAI_API_KEY": "sk-your-openai-api-key",
+        "EMBEDDING_MODEL": "text-embedding-3-small",
+        "VECTOR_DATABASE_PROVIDER": "Milvus",
+        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+      }
+    }
+  }
+}
+```
+
 ## Quick Start
+
+### Option 1: Quick Start for Local Deployment (Recommended) 🚀
+
+**Get started in minutes with our fully local setup - no API keys required!**
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/zilliztech/claude-context.git
+cd claude-context
+
+# 2. Run the automated setup script (builds project + starts Docker services)
+./scripts/setup-local.sh
+
+# 3. The script will output the exact MCP configuration to use
+# For Claude Code, use the command it provides
+# For other MCP clients, use the JSON configuration it provides
+
+# 4. Start using Claude Context!
+cd your-project-directory
+claude
+# Then type: "Index this codebase"
+```
+
+**What this gives you:**
+
+- ✅ **Complete privacy** - Everything runs locally
+- ✅ **No API costs** - No external API calls
+- ✅ **Offline operation** - Works without internet
+- ✅ **High performance** - Local vector database and embedding model
+
+### Option 2: Cloud Deployment (Traditional Setup)
 
 ### Prerequisites
 
@@ -39,14 +153,15 @@ Claude Context needs a vector database. You can [sign up](https://cloud.zilliz.c
 ![](assets/signup_and_get_apikey.png)
 
 Copy your Personal Key to replace `your-zilliz-cloud-api-key` in the configuration examples.
+
 </details>
 
 <details>
 <summary>Get OpenAI API Key for embedding model</summary>
 
-You need an OpenAI API key for the embedding model. You can get one by signing up at [OpenAI](https://platform.openai.com/api-keys).  
+You need an OpenAI API key for the embedding model. You can get one by signing up at [OpenAI](https://platform.openai.com/api-keys).
 
-Your API key will look like this: it always starts with `sk-`.  
+Your API key will look like this: it always starts with `sk-`.
 Copy your key and use it in the configuration examples below as `your-openai-api-key`.
 
 </details>
@@ -320,7 +435,7 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
 
 7. Click the **Add** button.
 
-------
+---
 
 #### **B. Manual Configuration**
 
@@ -330,11 +445,11 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
 4. Add the server configuration to the `mcpServers` array in the `augment.advanced` object
 
 ```json
-"augment.advanced": { 
-  "mcpServers": [ 
-    { 
-      "name": "claude-context", 
-      "command": "npx", 
+"augment.advanced": {
+  "mcpServers": [
+    {
+      "name": "claude-context",
+      "command": "npx",
       "args": ["-y", "@zilliz/claude-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key",
@@ -389,15 +504,14 @@ Zencoder offers support for MCP tools and servers in both its JetBrains and VS C
 
 ```json
 {
-    "command": "npx",
-    "args": ["@zilliz/claude-context-mcp@latest"],
-    "env": {
-      "OPENAI_API_KEY": "your-openai-api-key",
-      "MILVUS_ADDRESS": "your-zilliz-cloud-public-endpoint",
-      "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-    }
+  "command": "npx",
+  "args": ["@zilliz/claude-context-mcp@latest"],
+  "env": {
+    "OPENAI_API_KEY": "your-openai-api-key",
+    "MILVUS_ADDRESS": "your-zilliz-cloud-public-endpoint",
+    "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+  }
 }
-
 ```
 
 5. Save the server by hitting the `Install` button.
@@ -493,7 +607,7 @@ Get the current indexing status of a codebase. Shows progress percentage for act
 
 ### 🔧 Implementation Details
 
-- 🔍 **Hybrid Code Search**: Ask questions like *"find functions that handle user authentication"* and get relevant, context-rich code instantly using advanced hybrid search (BM25 + dense vector).
+- 🔍 **Hybrid Code Search**: Ask questions like _"find functions that handle user authentication"_ and get relevant, context-rich code instantly using advanced hybrid search (BM25 + dense vector).
 - 🧠 **Context-Aware**: Discover large codebase, understand how different parts of your codebase relate, even across millions of lines of code.
 - ⚡ **Incremental Indexing**: Efficiently re-index only changed files using Merkle trees.
 - 🧩 **Intelligent Code Chunking**: Analyze code in Abstract Syntax Trees (AST) for chunking.
@@ -527,38 +641,48 @@ While MCP is the recommended way to use Claude Context with AI assistants, you c
 The `@zilliz/claude-context-core` package provides the fundamental functionality for code indexing and semantic search.
 
 ```typescript
-import { Context, MilvusVectorDatabase, OpenAIEmbedding } from '@zilliz/claude-context-core';
+import {
+  Context,
+  MilvusVectorDatabase,
+  OpenAIEmbedding,
+} from "@zilliz/claude-context-core";
 
 // Initialize embedding provider
 const embedding = new OpenAIEmbedding({
-    apiKey: process.env.OPENAI_API_KEY || 'your-openai-api-key',
-    model: 'text-embedding-3-small'
+  apiKey: process.env.OPENAI_API_KEY || "your-openai-api-key",
+  model: "text-embedding-3-small",
 });
 
 // Initialize vector database
 const vectorDatabase = new MilvusVectorDatabase({
-    address: process.env.MILVUS_ADDRESS || 'your-zilliz-cloud-public-endpoint',
-    token: process.env.MILVUS_TOKEN || 'your-zilliz-cloud-api-key'
+  address: process.env.MILVUS_ADDRESS || "your-zilliz-cloud-public-endpoint",
+  token: process.env.MILVUS_TOKEN || "your-zilliz-cloud-api-key",
 });
 
 // Create context instance
 const context = new Context({
-    embedding,
-    vectorDatabase
+  embedding,
+  vectorDatabase,
 });
 
 // Index your codebase with progress tracking
-const stats = await context.indexCodebase('./your-project', (progress) => {
-    console.log(`${progress.phase} - ${progress.percentage}%`);
+const stats = await context.indexCodebase("./your-project", (progress) => {
+  console.log(`${progress.phase} - ${progress.percentage}%`);
 });
 console.log(`Indexed ${stats.indexedFiles} files, ${stats.totalChunks} chunks`);
 
 // Perform semantic search
-const results = await context.semanticSearch('./your-project', 'vector database operations', 5);
-results.forEach(result => {
-    console.log(`File: ${result.relativePath}:${result.startLine}-${result.endLine}`);
-    console.log(`Score: ${(result.score * 100).toFixed(2)}%`);
-    console.log(`Content: ${result.content.substring(0, 100)}...`);
+const results = await context.semanticSearch(
+  "./your-project",
+  "vector database operations",
+  5
+);
+results.forEach((result) => {
+  console.log(
+    `File: ${result.relativePath}:${result.startLine}-${result.endLine}`
+  );
+  console.log(`Score: ${(result.score * 100).toFixed(2)}%`);
+  console.log(`Content: ${result.content.substring(0, 100)}...`);
 });
 ```
 
@@ -568,12 +692,11 @@ Integrates Claude Context directly into your IDE. Provides an intuitive interfac
 
 1. **Direct Link**: [Install from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=zilliz.semanticcodesearch)
 2. **Manual Search**:
-    - Open Extensions view in VSCode (Ctrl+Shift+X or Cmd+Shift+X on Mac)
-    - Search for "Semantic Code Search"
-    - Click Install
+   - Open Extensions view in VSCode (Ctrl+Shift+X or Cmd+Shift+X on Mac)
+   - Search for "Semantic Code Search"
+   - Click Install
 
-![img](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdtCtT9Qi6o5mGVoxzX50r8Nb6zDFcjvTQR7WZ-xMbEsHEPPhSYAFVJ7q4-rETzxJ8wy1cyZmU8CmtpNhAU8PGOqVnE2kc2HCn1etDg97Qsh7m89kBjG4ZT7XBgO4Dp7BfFZx7eow?key=qYdFquJrLcfXCUndY-YRBQ)
----
+## ![img](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdtCtT9Qi6o5mGVoxzX50r8Nb6zDFcjvTQR7WZ-xMbEsHEPPhSYAFVJ7q4-rETzxJ8wy1cyZmU8CmtpNhAU8PGOqVnE2kc2HCn1etDg97Qsh7m89kBjG4ZT7XBgO4Dp7BfFZx7eow?key=qYdFquJrLcfXCUndY-YRBQ)
 
 ## 🛠️ Development
 
@@ -700,7 +823,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 **Package-specific contributing guides:**
 
 - [Core Package Contributing](packages/core/CONTRIBUTING.md)
-- [MCP Server Contributing](packages/mcp/CONTRIBUTING.md)  
+- [MCP Server Contributing](packages/mcp/CONTRIBUTING.md)
 - [VSCode Extension Contributing](packages/vscode-extension/CONTRIBUTING.md)
 
 ---

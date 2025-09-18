@@ -22,7 +22,7 @@ import {
     CallToolRequestSchema
 } from "@modelcontextprotocol/sdk/types.js";
 import { Context } from "@zilliz/claude-context-core";
-import { MilvusVectorDatabase } from "@zilliz/claude-context-core";
+import { MilvusVectorDatabase, ChromaDBVectorDatabase } from "@zilliz/claude-context-core";
 
 // Import our modular components
 import { createMcpConfig, logConfigurationSummary, showHelpMessage, ContextMcpConfig } from "./config.js";
@@ -60,10 +60,22 @@ class ContextMcpServer {
         logEmbeddingProviderInfo(config, embedding);
 
         // Initialize vector database
-        const vectorDatabase = new MilvusVectorDatabase({
-            address: config.milvusAddress,
-            ...(config.milvusToken && { token: config.milvusToken })
-        });
+        let vectorDatabase;
+        if (config.vectorDatabaseProvider === 'ChromaDB') {
+            console.log(`[VECTOR-DB] Initializing ChromaDB vector database`);
+            vectorDatabase = new ChromaDBVectorDatabase({
+                host: config.chromaHost,
+                port: config.chromaPort,
+                path: config.chromaPath,
+                ssl: config.chromaSsl
+            });
+        } else {
+            console.log(`[VECTOR-DB] Initializing Milvus vector database`);
+            vectorDatabase = new MilvusVectorDatabase({
+                address: config.milvusAddress,
+                ...(config.milvusToken && { token: config.milvusToken })
+            });
+        }
 
         // Initialize Claude Context
         this.context = new Context({

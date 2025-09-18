@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # ChromaDB for local vector database
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: claude-context-chromadb
+    ports:
+      - "8002:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - CHROMA_SERVER_HOST=0.0.0.0
+      - CHROMA_SERVER_HTTP_PORT=8000
+      - CHROMA_SERVER_CORS_ALLOW_ORIGINS=["*"]
+    restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD-SHELL", "ps aux | grep -v grep | grep chroma || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+
+  # Ollama for local embedding models
+  ollama:
+    image: ollama/ollama:latest
+    container_name: claude-context-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD-SHELL", "ps aux | grep -v grep | grep ollama || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+
+volumes:
+  chromadb_data:
+    driver: local
+  ollama_data:
+    driver: local

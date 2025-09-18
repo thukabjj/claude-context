@@ -20,13 +20,15 @@ Claude Context supports a global configuration file at `~/.context/.env` to simp
 ### Embedding Provider
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `EMBEDDING_PROVIDER` | Provider: `OpenAI`, `VoyageAI`, `Gemini`, `Ollama` | `OpenAI` |
+| `EMBEDDING_PROVIDER` | Provider: `OpenAI`, `VoyageAI`, `Gemini`, `Ollama`, `OpenRouter` | `OpenAI` |
 | `EMBEDDING_MODEL` | Embedding model name (works for all providers) | Provider-specific default |
 | `OPENAI_API_KEY` | OpenAI API key | Required for OpenAI |
 | `OPENAI_BASE_URL` | OpenAI API base URL (optional, for custom endpoints) | `https://api.openai.com/v1` |
 | `VOYAGEAI_API_KEY` | VoyageAI API key | Required for VoyageAI |
 | `GEMINI_API_KEY` | Gemini API key | Required for Gemini |
 | `GEMINI_BASE_URL` | Gemini API base URL (optional, for custom endpoints) | `https://generativelanguage.googleapis.com/v1beta` |
+| `OPENROUTER_API_KEY` | OpenRouter API key | Required for OpenRouter |
+| `OPENROUTER_BASE_URL` | OpenRouter API base URL (optional, for custom endpoints) | `https://openrouter.ai/api/v1` |
 
 > **💡 Note:** `EMBEDDING_MODEL` is a universal environment variable that works with all embedding providers. Simply set it to the model name you want to use (e.g., `text-embedding-3-large` for OpenAI, `voyage-code-3` for VoyageAI, etc.).
 
@@ -45,8 +47,13 @@ Claude Context supports a global configuration file at `~/.context/.env` to simp
 ### Vector Database
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `VECTOR_DATABASE_PROVIDER` | Vector database provider: `Milvus`, `ChromaDB` | `Milvus` |
 | `MILVUS_TOKEN` | Milvus authentication token. Get [Zilliz Personal API Key](https://github.com/zilliztech/claude-context/blob/master/assets/signup_and_get_apikey.png) | Recommended |
 | `MILVUS_ADDRESS` | Milvus server address. Optional when using Zilliz Personal API Key | Auto-resolved from token |
+| `CHROMA_HOST` | ChromaDB host address | `localhost` |
+| `CHROMA_PORT` | ChromaDB port | `8000` |
+| `CHROMA_PATH` | ChromaDB path (optional) | None |
+| `CHROMA_SSL` | ChromaDB SSL (true/false) | `false` |
 
 ### Ollama (Optional)
 | Variable | Description | Default |
@@ -67,13 +74,42 @@ Claude Context supports a global configuration file at `~/.context/.env` to simp
 ## 🚀 Quick Setup
 
 ### 1. Create Global Config
+
+**For Cloud Deployment (OpenAI + Zilliz Cloud):**
 ```bash
 mkdir -p ~/.context
 cat > ~/.context/.env << 'EOF'
 EMBEDDING_PROVIDER=OpenAI
 OPENAI_API_KEY=sk-your-openai-api-key
 EMBEDDING_MODEL=text-embedding-3-small
+VECTOR_DATABASE_PROVIDER=Milvus
 MILVUS_TOKEN=your-zilliz-cloud-api-key
+EOF
+```
+
+**For Local Deployment (Ollama + ChromaDB):**
+```bash
+mkdir -p ~/.context
+cat > ~/.context/.env << 'EOF'
+EMBEDDING_PROVIDER=Ollama
+OLLAMA_HOST=http://localhost:11434
+EMBEDDING_MODEL=nomic-embed-text
+VECTOR_DATABASE_PROVIDER=ChromaDB
+CHROMA_HOST=localhost
+CHROMA_PORT=8000
+EOF
+```
+
+**For Open Source Models via OpenRouter:**
+```bash
+mkdir -p ~/.context
+cat > ~/.context/.env << 'EOF'
+EMBEDDING_PROVIDER=OpenRouter
+OPENROUTER_API_KEY=sk-or-your-openrouter-api-key
+EMBEDDING_MODEL=nomic-ai/nomic-embed-text-v1.5
+VECTOR_DATABASE_PROVIDER=ChromaDB
+CHROMA_HOST=localhost
+CHROMA_PORT=8000
 EOF
 ```
 

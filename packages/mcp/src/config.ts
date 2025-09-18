@@ -4,7 +4,7 @@ export interface ContextMcpConfig {
     name: string;
     version: string;
     // Embedding provider configuration
-    embeddingProvider: 'OpenAI' | 'VoyageAI' | 'Gemini' | 'Ollama';
+    embeddingProvider: 'OpenAI' | 'VoyageAI' | 'Gemini' | 'Ollama' | 'OpenRouter';
     embeddingModel: string;
     // Provider-specific API keys
     openaiApiKey?: string;
@@ -12,12 +12,19 @@ export interface ContextMcpConfig {
     voyageaiApiKey?: string;
     geminiApiKey?: string;
     geminiBaseUrl?: string;
+    openrouterApiKey?: string;
+    openrouterBaseUrl?: string;
     // Ollama configuration
     ollamaModel?: string;
     ollamaHost?: string;
     // Vector database configuration
+    vectorDatabaseProvider: 'Milvus' | 'ChromaDB';
     milvusAddress?: string; // Optional, can be auto-resolved from token
     milvusToken?: string;
+    chromaHost?: string;
+    chromaPort?: number;
+    chromaPath?: string;
+    chromaSsl?: boolean;
 }
 
 // Legacy format (v1) - for backward compatibility
@@ -78,6 +85,8 @@ export function getDefaultModelForProvider(provider: string): string {
             return 'gemini-embedding-001';
         case 'Ollama':
             return 'nomic-embed-text';
+        case 'OpenRouter':
+            return 'nomic-ai/nomic-embed-text-v1.5';
         default:
             return 'text-embedding-3-small';
     }
@@ -94,6 +103,7 @@ export function getEmbeddingModelForProvider(provider: string): string {
         case 'OpenAI':
         case 'VoyageAI':
         case 'Gemini':
+        case 'OpenRouter':
         default:
             // For all other providers, use EMBEDDING_MODEL or default
             const selectedModel = envManager.get('EMBEDDING_MODEL') || getDefaultModelForProvider(provider);
@@ -110,14 +120,16 @@ export function createMcpConfig(): ContextMcpConfig {
     console.log(`[DEBUG]   OLLAMA_MODEL: ${envManager.get('OLLAMA_MODEL') || 'NOT SET'}`);
     console.log(`[DEBUG]   GEMINI_API_KEY: ${envManager.get('GEMINI_API_KEY') ? 'SET (length: ' + envManager.get('GEMINI_API_KEY')!.length + ')' : 'NOT SET'}`);
     console.log(`[DEBUG]   OPENAI_API_KEY: ${envManager.get('OPENAI_API_KEY') ? 'SET (length: ' + envManager.get('OPENAI_API_KEY')!.length + ')' : 'NOT SET'}`);
+    console.log(`[DEBUG]   OPENROUTER_API_KEY: ${envManager.get('OPENROUTER_API_KEY') ? 'SET (length: ' + envManager.get('OPENROUTER_API_KEY')!.length + ')' : 'NOT SET'}`);
     console.log(`[DEBUG]   MILVUS_ADDRESS: ${envManager.get('MILVUS_ADDRESS') || 'NOT SET'}`);
+    console.log(`[DEBUG]   CHROMA_HOST: ${envManager.get('CHROMA_HOST') || 'NOT SET'}`);
     console.log(`[DEBUG]   NODE_ENV: ${envManager.get('NODE_ENV') || 'NOT SET'}`);
 
     const config: ContextMcpConfig = {
         name: envManager.get('MCP_SERVER_NAME') || "Context MCP Server",
         version: envManager.get('MCP_SERVER_VERSION') || "1.0.0",
         // Embedding provider configuration
-        embeddingProvider: (envManager.get('EMBEDDING_PROVIDER') as 'OpenAI' | 'VoyageAI' | 'Gemini' | 'Ollama') || 'OpenAI',
+        embeddingProvider: (envManager.get('EMBEDDING_PROVIDER') as 'OpenAI' | 'VoyageAI' | 'Gemini' | 'Ollama' | 'OpenRouter') || 'OpenAI',
         embeddingModel: getEmbeddingModelForProvider(envManager.get('EMBEDDING_PROVIDER') || 'OpenAI'),
         // Provider-specific API keys
         openaiApiKey: envManager.get('OPENAI_API_KEY'),
@@ -125,12 +137,19 @@ export function createMcpConfig(): ContextMcpConfig {
         voyageaiApiKey: envManager.get('VOYAGEAI_API_KEY'),
         geminiApiKey: envManager.get('GEMINI_API_KEY'),
         geminiBaseUrl: envManager.get('GEMINI_BASE_URL'),
+        openrouterApiKey: envManager.get('OPENROUTER_API_KEY'),
+        openrouterBaseUrl: envManager.get('OPENROUTER_BASE_URL'),
         // Ollama configuration
         ollamaModel: envManager.get('OLLAMA_MODEL'),
         ollamaHost: envManager.get('OLLAMA_HOST'),
-        // Vector database configuration - address can be auto-resolved from token
+        // Vector database configuration
+        vectorDatabaseProvider: (envManager.get('VECTOR_DATABASE_PROVIDER') as 'Milvus' | 'ChromaDB') || 'Milvus',
         milvusAddress: envManager.get('MILVUS_ADDRESS'), // Optional, can be resolved from token
-        milvusToken: envManager.get('MILVUS_TOKEN')
+        milvusToken: envManager.get('MILVUS_TOKEN'),
+        chromaHost: envManager.get('CHROMA_HOST'),
+        chromaPort: envManager.get('CHROMA_PORT') ? parseInt(envManager.get('CHROMA_PORT')!) : undefined,
+        chromaPath: envManager.get('CHROMA_PATH'),
+        chromaSsl: envManager.get('CHROMA_SSL') === 'true'
     };
 
     return config;
@@ -143,7 +162,12 @@ export function logConfigurationSummary(config: ContextMcpConfig): void {
     console.log(`[MCP]   Server: ${config.name} v${config.version}`);
     console.log(`[MCP]   Embedding Provider: ${config.embeddingProvider}`);
     console.log(`[MCP]   Embedding Model: ${config.embeddingModel}`);
-    console.log(`[MCP]   Milvus Address: ${config.milvusAddress || (config.milvusToken ? '[Auto-resolve from token]' : '[Not configured]')}`);
+    console.log(`[MCP]   Vector Database Provider: ${config.vectorDatabaseProvider}`);
+    if (config.vectorDatabaseProvider === 'Milvus') {
+        console.log(`[MCP]   Milvus Address: ${config.milvusAddress || (config.milvusToken ? '[Auto-resolve from token]' : '[Not configured]')}`);
+    } else if (config.vectorDatabaseProvider === 'ChromaDB') {
+        console.log(`[MCP]   ChromaDB Host: ${config.chromaHost || 'localhost'}:${config.chromaPort || 8000}`);
+    }
 
     // Log provider-specific configuration without exposing sensitive data
     switch (config.embeddingProvider) {
@@ -166,6 +190,12 @@ export function logConfigurationSummary(config: ContextMcpConfig): void {
             console.log(`[MCP]   Ollama Host: ${config.ollamaHost || 'http://127.0.0.1:11434'}`);
             console.log(`[MCP]   Ollama Model: ${config.embeddingModel}`);
             break;
+        case 'OpenRouter':
+            console.log(`[MCP]   OpenRouter API Key: ${config.openrouterApiKey ? '✅ Configured' : '❌ Missing'}`);
+            if (config.openrouterBaseUrl) {
+                console.log(`[MCP]   OpenRouter Base URL: ${config.openrouterBaseUrl}`);
+            }
+            break;
     }
 
     console.log(`[MCP] 🔧 Initializing server components...`);
@@ -185,7 +215,7 @@ Environment Variables:
   MCP_SERVER_VERSION      Server version
   
   Embedding Provider Configuration:
-  EMBEDDING_PROVIDER      Embedding provider: OpenAI, VoyageAI, Gemini, Ollama (default: OpenAI)
+  EMBEDDING_PROVIDER      Embedding provider: OpenAI, VoyageAI, Gemini, Ollama, OpenRouter (default: OpenAI)
   EMBEDDING_MODEL         Embedding model name (works for all providers)
   
   Provider-specific API Keys:
@@ -194,14 +224,21 @@ Environment Variables:
   VOYAGEAI_API_KEY        VoyageAI API key (required for VoyageAI provider)
   GEMINI_API_KEY          Google AI API key (required for Gemini provider)
   GEMINI_BASE_URL         Gemini API base URL (optional, for custom endpoints)
+  OPENROUTER_API_KEY      OpenRouter API key (required for OpenRouter provider)
+  OPENROUTER_BASE_URL     OpenRouter API base URL (optional, for custom endpoints)
   
   Ollama Configuration:
   OLLAMA_HOST             Ollama server host (default: http://127.0.0.1:11434)
   OLLAMA_MODEL            Ollama model name (alternative to EMBEDDING_MODEL for Ollama)
   
   Vector Database Configuration:
+  VECTOR_DATABASE_PROVIDER Vector database provider: Milvus, ChromaDB (default: Milvus)
   MILVUS_ADDRESS          Milvus address (optional, can be auto-resolved from token)
   MILVUS_TOKEN            Milvus token (optional, used for authentication and address resolution)
+  CHROMA_HOST             ChromaDB host (default: localhost)
+  CHROMA_PORT             ChromaDB port (default: 8000)
+  CHROMA_PATH             ChromaDB path (optional)
+  CHROMA_SSL              ChromaDB SSL (default: false)
 
 Examples:
   # Start MCP server with OpenAI (default) and explicit Milvus address
@@ -221,5 +258,11 @@ Examples:
   
   # Start MCP server with Ollama and specific model (using EMBEDDING_MODEL)
   EMBEDDING_PROVIDER=Ollama EMBEDDING_MODEL=nomic-embed-text MILVUS_TOKEN=your-token npx @zilliz/claude-context-mcp@latest
+  
+  # Start MCP server with OpenRouter and open source models
+  EMBEDDING_PROVIDER=OpenRouter OPENROUTER_API_KEY=sk-or-xxx EMBEDDING_MODEL=nomic-ai/nomic-embed-text-v1.5 VECTOR_DATABASE_PROVIDER=ChromaDB npx @zilliz/claude-context-mcp@latest
+  
+  # Start MCP server with OpenRouter and ChromaDB for fully local deployment
+  EMBEDDING_PROVIDER=OpenRouter OPENROUTER_API_KEY=sk-or-xxx EMBEDDING_MODEL=bge-large-en-v1.5 VECTOR_DATABASE_PROVIDER=ChromaDB CHROMA_HOST=localhost CHROMA_PORT=8000 npx @zilliz/claude-context-mcp@latest
         `);
 } 

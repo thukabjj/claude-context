@@ -1,8 +1,8 @@
-import { OpenAIEmbedding, VoyageAIEmbedding, GeminiEmbedding, OllamaEmbedding } from "@zilliz/claude-context-core";
+import { OpenAIEmbedding, VoyageAIEmbedding, GeminiEmbedding, OllamaEmbedding, OpenRouterEmbedding } from "@zilliz/claude-context-core";
 import { ContextMcpConfig } from "./config.js";
 
 // Helper function to create embedding instance based on provider
-export function createEmbeddingInstance(config: ContextMcpConfig): OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding {
+export function createEmbeddingInstance(config: ContextMcpConfig): OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding | OpenRouterEmbedding {
     console.log(`[EMBEDDING] Creating ${config.embeddingProvider} embedding instance...`);
 
     switch (config.embeddingProvider) {
@@ -57,13 +57,27 @@ export function createEmbeddingInstance(config: ContextMcpConfig): OpenAIEmbeddi
             console.log(`[EMBEDDING] ✅ Ollama embedding instance created successfully`);
             return ollamaEmbedding;
 
+        case 'OpenRouter':
+            if (!config.openrouterApiKey) {
+                console.error(`[EMBEDDING] ❌ OpenRouter API key is required but not provided`);
+                throw new Error('OPENROUTER_API_KEY is required for OpenRouter embedding provider');
+            }
+            console.log(`[EMBEDDING] 🔧 Configuring OpenRouter with model: ${config.embeddingModel}`);
+            const openrouterEmbedding = new OpenRouterEmbedding({
+                apiKey: config.openrouterApiKey,
+                model: config.embeddingModel,
+                ...(config.openrouterBaseUrl && { baseUrl: config.openrouterBaseUrl })
+            });
+            console.log(`[EMBEDDING] ✅ OpenRouter embedding instance created successfully`);
+            return openrouterEmbedding;
+
         default:
             console.error(`[EMBEDDING] ❌ Unsupported embedding provider: ${config.embeddingProvider}`);
             throw new Error(`Unsupported embedding provider: ${config.embeddingProvider}`);
     }
 }
 
-export function logEmbeddingProviderInfo(config: ContextMcpConfig, embedding: OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding): void {
+export function logEmbeddingProviderInfo(config: ContextMcpConfig, embedding: OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding | OpenRouterEmbedding): void {
     console.log(`[EMBEDDING] ✅ Successfully initialized ${config.embeddingProvider} embedding provider`);
     console.log(`[EMBEDDING] Provider details - Model: ${config.embeddingModel}, Dimension: ${embedding.getDimension()}`);
 
@@ -80,6 +94,9 @@ export function logEmbeddingProviderInfo(config: ContextMcpConfig, embedding: Op
             break;
         case 'Ollama':
             console.log(`[EMBEDDING] Ollama configuration - Host: ${config.ollamaHost || 'http://127.0.0.1:11434'}, Model: ${config.embeddingModel}`);
+            break;
+        case 'OpenRouter':
+            console.log(`[EMBEDDING] OpenRouter configuration - API Key: ${config.openrouterApiKey ? '✅ Provided' : '❌ Missing'}, Base URL: ${config.openrouterBaseUrl || 'Default'}`);
             break;
     }
 } 

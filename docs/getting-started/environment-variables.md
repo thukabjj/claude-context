@@ -41,6 +41,8 @@ Claude Context supports a global configuration file at `~/.context/.env` to simp
 > - Gemini Models: See `getSupportedModels` in [`gemini-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/gemini-embedding.ts) for the full list of supported models.
 > 
 > - Ollama Models: Depends on the model you install locally.
+> 
+> - OpenRouter Models: See `getSupportedModels` in [`openrouter-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/openrouter-embedding.ts) for the full list of supported models.
 
 > **📖 For detailed provider-specific configuration examples and setup instructions, see the [MCP Configuration Guide](../../packages/mcp/README.md#embedding-provider-configuration).**
 

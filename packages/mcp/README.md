@@ -149,6 +149,47 @@ OLLAMA_HOST=http://127.0.0.1:11434
 
 </details>
 
+<details>
+<summary><strong>5. OpenRouter Configuration (Open Source Models)</strong></summary>
+
+OpenRouter provides access to high-quality open source embedding models with competitive pricing.
+
+```bash
+# Required: Your OpenRouter API key
+OPENROUTER_API_KEY=sk-or-your-openrouter-api-key
+
+# Optional: Specify embedding model (default: nomic-ai/nomic-embed-text-v1.5)
+EMBEDDING_MODEL=nomic-ai/nomic-embed-text-v1.5
+
+# Optional: Custom API base URL (for custom endpoints)
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+```
+
+**Available Models:**
+- `nomic-ai/nomic-embed-text-v1.5` (768 dimensions) - Latest and most accurate
+- `nomic-ai/nomic-embed-text-v1` (768 dimensions) - Previous version
+- `bge-large-en-v1.5` (1024 dimensions) - Large model for complex tasks
+- `bge-base-en-v1.5` (768 dimensions) - Balanced performance
+- `bge-small-en-v1.5` (384 dimensions) - Fast and efficient
+- `mxbai-embed-large` (1024 dimensions) - Multilingual support
+- `mxbai-embed-base` (768 dimensions) - Multilingual base model
+
+**Getting API Key:**
+
+1. Visit [OpenRouter](https://openrouter.ai/)
+2. Sign up for an account
+3. Navigate to API Keys section
+4. Create a new API key (starts with `sk-or-`)
+5. Add credits to your account for usage
+
+**Benefits:**
+- ✅ Access to high-quality open source embedding models
+- ✅ Lower costs compared to OpenAI
+- ✅ No need to run embedding models locally
+- ✅ Competitive pricing with pay-per-use model
+
+</details>
+
 #### Get a free vector database on Zilliz Cloud
 
 Claude Context needs a vector database. You can [sign up](https://cloud.zilliz.com/signup?utm_source=github&utm_medium=referral&utm_campaign=2507-codecontext-readme) on Zilliz Cloud to get an API key.
@@ -347,6 +388,25 @@ Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file i
         "EMBEDDING_PROVIDER": "Ollama",
         "EMBEDDING_MODEL": "nomic-embed-text",
         "OLLAMA_HOST": "http://127.0.0.1:11434",
+        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+      }
+    }
+  }
+}
+```
+
+**OpenRouter Configuration:**
+
+```json
+{
+  "mcpServers": {
+    "claude-context": {
+      "command": "npx",
+      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+      "env": {
+        "EMBEDDING_PROVIDER": "OpenRouter",
+        "OPENROUTER_API_KEY": "sk-or-your-openrouter-api-key",
+        "EMBEDDING_MODEL": "nomic-ai/nomic-embed-text-v1.5",
         "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
       }
     }

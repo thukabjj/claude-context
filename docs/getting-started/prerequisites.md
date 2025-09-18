@@ -27,6 +27,12 @@ Before setting up Claude Context, ensure you have the following requirements met
 - **Models**: Pull embedding models like `nomic-embed-text`
 - **Hardware**: Sufficient RAM for model loading (varies by model)
 
+#### Option 5: OpenRouter (Open Source Models)
+- **API Key**: Get from [OpenRouter](https://openrouter.ai/)
+- **Models**: Access to high-quality open source embedding models like `nomic-ai/nomic-embed-text-v1.5`
+- **Benefits**: Lower costs compared to OpenAI, access to open source models without local setup
+- **Billing**: Pay-per-use pricing with competitive rates
+
 ### Vector Database
 
 #### Zilliz Cloud (Recommended)

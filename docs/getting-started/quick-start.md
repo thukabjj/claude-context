@@ -159,6 +159,24 @@ Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file i
 }
 ```
 
+**OpenRouter Configuration:**
+```json
+{
+  "mcpServers": {
+    "claude-context": {
+      "command": "npx",
+      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+      "env": {
+        "EMBEDDING_PROVIDER": "OpenRouter",
+        "OPENROUTER_API_KEY": "sk-or-your-openrouter-api-key",
+        "EMBEDDING_MODEL": "nomic-ai/nomic-embed-text-v1.5",
+        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+      }
+    }
+  }
+}
+```
+
 **Gemini Configuration:**
 ```json
 {

@@ -7,7 +7,7 @@
             ],
             "env": {
                 "EMBEDDING_PROVIDER": "OpenRouter",
-                "OPENROUTER_API_KEY": "sk-or-your-openrouter-api-key",
+                "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
                 "EMBEDDING_MODEL": "nomic-ai/nomic-embed-text-v1.5",
                 "VECTOR_DATABASE_PROVIDER": "ChromaDB",
                 "CHROMA_HOST": "localhost",

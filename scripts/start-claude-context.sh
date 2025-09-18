@@ -109,8 +109,8 @@ generate_mcp_config() {
 {
   "mcpServers": {
     "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+      "command": "node",
+      "args": ["/Users/arthurcosta/dev/personal/claude-context/packages/mcp/dist/index.js"],
       "env": {
         "EMBEDDING_PROVIDER": "OpenRouter",
         "OPENROUTER_API_KEY": "$openrouter_key",

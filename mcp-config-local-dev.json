@@ -1,9 +1,10 @@
 {
     "mcpServers": {
         "claude-context": {
-            "command": "node",
+            "command": "npx",
             "args": [
-                "/Users/arthurcosta/dev/personal/claude-context/packages/mcp/dist/index.js"
+                "tsx",
+                "/Users/arthurcosta/dev/personal/claude-context/packages/mcp/src/index.ts"
             ],
             "env": {
                 "EMBEDDING_PROVIDER": "OpenRouter",
